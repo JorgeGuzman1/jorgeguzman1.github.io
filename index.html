@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jorge Guzmán | Robotics & Software Engineer</title>
+    <meta
+      name="description"
+      content="Portfolio for Jorge Guzmán, a robotics and software engineer focused on embedded autonomy, controls, and reliable systems."
+    />
+    <meta
+      name="keywords"
+      content="Jorge Guzmán, robotics engineer, software engineer, embedded systems, controls, computer vision, C++, Python"
+    />
+    <meta name="author" content="Jorge Guzmán" />
+
+    <meta property="og:title" content="Jorge Guzmán | Robotics & Software Engineer" />
+    <meta
+      property="og:description"
+      content="Portfolio featuring robotics software projects in sensor fusion, planning, controls, and autonomous systems."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://jorgeguzman.github.io/" />
+    <meta property="og:image" content="https://jorgeguzman.github.io/assets/jorge-placeholder.svg" />
+
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="ambient-glow" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Go to top">
+        <span class="brand-mark">JG</span>
+        <span class="brand-text">Jorge Guzmán</span>
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="#about">About</a>
+        <a href="#skills">Skills</a>
+        <a href="#projects">Projects</a>
+        <a href="#experience">Experience</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <main id="top" class="container">
+      <section class="hero section" aria-labelledby="hero-title">
+        <div class="hero-content">
+          <p class="eyebrow">Robotics + Software Engineering</p>
+          <h1 id="hero-title">Jorge Guzmán</h1>
+          <p class="tagline">
+            Building reliable autonomy stacks from low-level embedded control to full-system
+            software architecture.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#" aria-label="Resume PDF placeholder">
+              Resume (PDF)
+            </a>
+            <a class="btn btn-secondary" href="https://github.com/" target="_blank" rel="noreferrer noopener">
+              GitHub
+            </a>
+            <a class="btn btn-secondary" href="https://www.linkedin.com/" target="_blank" rel="noreferrer noopener">
+              LinkedIn
+            </a>
+          </div>
+        </div>
+
+        <div class="hero-media">
+          <img src="assets/jorge-placeholder.svg" alt="Portrait placeholder for Jorge Guzmán" />
+        </div>
+      </section>
+
+      <section id="about" class="section" aria-labelledby="about-title">
+        <h2 id="about-title">About</h2>
+        <div class="card">
+          <p>
+            I build robotics software that ships on real hardware. My focus is on writing clear,
+            testable code for estimation, planning, control, and embedded integration so robots
+            can perform predictably under real-world constraints.
+          </p>
+        </div>
+      </section>
+
+      <section id="skills" class="section" aria-labelledby="skills-title">
+        <h2 id="skills-title">Skills</h2>
+        <div class="skills-grid">
+          <article class="card skill-group">
+            <h3>C++</h3>
+            <p>Modern C++ (C++17/20), performance-focused architecture, and hardware-near logic.</p>
+          </article>
+          <article class="card skill-group">
+            <h3>Python</h3>
+            <p>Rapid prototyping, automation scripts, data pipelines, and analysis tooling.</p>
+          </article>
+          <article class="card skill-group">
+            <h3>Embedded/Robotics</h3>
+            <p>Sensor integration, real-time constraints, microcontrollers, and Linux robotics stacks.</p>
+          </article>
+          <article class="card skill-group">
+            <h3>Controls</h3>
+            <p>State-space intuition, trajectory tracking, model tuning, and stability-aware implementation.</p>
+          </article>
+          <article class="card skill-group">
+            <h3>CV</h3>
+            <p>Feature extraction, camera pipelines, and practical vision systems for autonomy tasks.</p>
+          </article>
+          <article class="card skill-group">
+            <h3>Tooling</h3>
+            <p>Git, CI workflows, profiling, simulation, and deployment-oriented engineering practice.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="projects" class="section" aria-labelledby="projects-title">
+        <h2 id="projects-title">Projects</h2>
+        <div class="projects-grid">
+          <article class="card project-card">
+            <h3>EKF Sensor Fusion</h3>
+            <p>
+              Fused IMU, wheel odometry, and vision updates into a robust state estimate with
+              uncertainty-aware prediction and correction.
+            </p>
+            <a href="projects/ekf-sensor-fusion.html">View Project</a>
+          </article>
+
+          <article class="card project-card">
+            <h3>A* + Path Smoothing (RDP)</h3>
+            <p>
+              Implemented grid-based A* for obstacle-aware routing, then simplified waypoints via
+              Ramer-Douglas-Peucker for smoother execution.
+            </p>
+            <a href="projects/astar-path-smoothing-rdp.html">View Project</a>
+          </article>
+
+          <article class="card project-card">
+            <h3>Holonomic Pure Pursuit + Pose Lock</h3>
+            <p>
+              Built high-accuracy path tracking for omnidirectional drive and added final pose lock
+              behavior for repeatable end-state precision.
+            </p>
+            <a href="projects/holonomic-pure-pursuit-pose-lock.html">View Project</a>
+          </article>
+
+          <article class="card project-card">
+            <h3>VEX Autonomous Stack on Raspberry Pi 5</h3>
+            <p>
+              Designed a modular autonomy stack running on Raspberry Pi 5 for planning, control,
+              and robot subsystem communication under match timing constraints.
+            </p>
+            <a href="projects/vex-autonomous-stack-rpi5.html">View Project</a>
+          </article>
+        </div>
+      </section>
+
+      <section id="experience" class="section" aria-labelledby="experience-title">
+        <h2 id="experience-title">Experience & Leadership</h2>
+        <article class="card experience-card">
+          <h3>AON Robotics</h3>
+          <p class="role">Software Lead</p>
+          <p>
+            Led software architecture, autonomous routine design, and integration workflows across
+            mechanical, electrical, and programming teams to improve reliability and development velocity.
+          </p>
+        </article>
+      </section>
+
+      <section id="contact" class="section" aria-labelledby="contact-title">
+        <h2 id="contact-title">Contact</h2>
+        <div class="card contact-card">
+          <p>
+            <strong>Email:</strong>
+            <a href="mailto:jorge@example.com">jorge@example.com</a>
+          </p>
+          <p>
+            <strong>GitHub:</strong>
+            <a href="https://github.com/" target="_blank" rel="noreferrer noopener">github.com/your-handle</a>
+          </p>
+          <p>
+            <strong>LinkedIn:</strong>
+            <a href="https://www.linkedin.com/" target="_blank" rel="noreferrer noopener">linkedin.com/in/your-handle</a>
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; 2026 Jorge Guzmán. Built with plain HTML and CSS.</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-label="Placeholder portrait graphic">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#111f35" />
+      <stop offset="100%" stop-color="#07111f" />
+    </linearGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7ea8ff" />
+      <stop offset="100%" stop-color="#53d6c7" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="900" fill="url(#bg)" />
+  <circle cx="600" cy="420" r="215" fill="none" stroke="url(#ring)" stroke-width="26" opacity="0.7" />
+  <circle cx="600" cy="420" r="145" fill="#12223a" stroke="#adc1e2" stroke-opacity="0.25" />
+  <path d="M600 346c-44 0-80 36-80 80v122h160V426c0-44-36-80-80-80z" fill="#8fb2ff" fill-opacity="0.82" />
+  <rect x="470" y="572" width="260" height="118" rx="24" fill="#53d6c7" fill-opacity="0.18" stroke="#53d6c7" stroke-opacity="0.45" />
+  <text x="600" y="644" fill="#d5e2ff" font-size="50" text-anchor="middle" font-family="'IBM Plex Mono', monospace" letter-spacing="3">JG</text>
+  <text x="600" y="770" fill="#9caac4" font-size="32" text-anchor="middle" font-family="'Space Grotesk', sans-serif">Robotics / Software Portfolio</text>
+</svg>
