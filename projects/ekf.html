@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Extended Kalman Filter for Mobile Robot Localization | Jorge M. Guzman</title>
+    <meta
+      name="description"
+      content="Extended Kalman Filter project by Jorge M. Guzman with deterministic 100 Hz operation, GPS fusion, and hardware-tested localization accuracy."
+    />
+    <meta property="og:title" content="Extended Kalman Filter for Mobile Robot Localization | Jorge M. Guzman" />
+    <meta
+      property="og:description"
+      content="C++ EKF with odometry fusion, GPS updates, Joseph-form covariance updates, and runtime gating for robust embedded operation."
+    />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://jorgeguzman.github.io/projects/ekf.html" />
+    <meta property="og:image" content="https://jorgeguzman.github.io/assets/jorge-placeholder.svg" />
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="../index.html#top" aria-label="Go to homepage top">
+        <span class="brand-mark">JG</span>
+        <span>Jorge M. Guzman</span>
+      </a>
+      <nav class="main-nav" aria-label="Primary navigation">
+        <a href="../index.html#projects">Projects</a>
+        <a href="../index.html#capabilities">Capabilities</a>
+        <a href="../index.html#experience">Experience</a>
+        <a href="../index.html#education">Education</a>
+        <a href="../index.html#contact">Contact</a>
+      </nav>
+    </header>
+
+    <main class="container page-title-wrap">
+      <a class="back-link" href="../index.html#projects">← Back to Projects</a>
+      <h1>Extended Kalman Filter for Mobile Robot Localization</h1>
+      <p class="lead">
+        C++ EKF implementation for encoder and gyro odometry fusion with GPS correction. The runtime
+        path is structured for deterministic 100 Hz execution on embedded hardware.
+      </p>
+
+      <section class="section project-grid" aria-labelledby="overview-title">
+        <article class="card">
+          <h2 id="overview-title">Overview</h2>
+          <p>
+            This estimator combines motion-model prediction and measurement updates to keep localization
+            stable during aggressive maneuvers. GPS is fused as a 2D measurement source, while heading
+            influence from GPS can be enabled or disabled via <code>gps_updates_theta_</code> policy.
+          </p>
+        </article>
+
+        <article class="card">
+          <h2>What I Built</h2>
+          <ul class="bullets">
+            <li>Implemented tank and holonomic EKF prediction models with explicit Jacobians and covariance propagation.</li>
+            <li>Implemented 2D GPS correction with Joseph-form covariance update for numerical robustness.</li>
+            <li>Added heading update path separated from GPS update path, with configurable GPS-to-heading coupling.</li>
+            <li>Integrated SensorFeeder pipeline with dt guards, IMU heading updates, and GPS rate-limited corrections.</li>
+            <li>Included lateral wheel offset compensation in holonomic mode before prediction update.</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h2>Technical Notes</h2>
+          <div class="meta">
+            <div class="meta-row"><strong>Fusion Inputs</strong><span>Encoder deltas, IMU heading/yaw rate, GPS position.</span></div>
+            <div class="meta-row"><strong>Runtime Policy</strong><span>dt guardrails plus rate-limited GPS update calls.</span></div>
+            <div class="meta-row"><strong>GPS Heading Policy</strong><span><code>gps_updates_theta_</code> disables GPS-driven heading correction when off.</span></div>
+            <div class="meta-row"><strong>Holonomic Compensation</strong><span><code>vy_center = vy_meas - omega * x_offset</code> before prediction.</span></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Results & Validation</h2>
+          <ul class="bullets">
+            <li>Hardware-tested localization error: approximately 0.7 inch.</li>
+            <li>Deterministic estimator/control integration loop: 100 Hz target operation.</li>
+            <li>GPS update robustness improved through RMS gating and variance floor/ceiling clamps.</li>
+            <li>Additional benchmark traces and sweep tables: [placeholder for future additions].</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h2>Code Snippets</h2>
+
+          <article class="snippet-card">
+            <p class="snippet-label">Snippet A — Holonomic prediction model + Jacobian (<code>EKF::predictHolonomic</code>)</p>
+            <pre><code>  const double th = x_.theta_rad;
+  const double c = std::cos(th);
+  const double s = std::sin(th);
+
+  const double dX = (vx_in_per_s * c - vy_in_per_s * s) * dt_s;
+  const double dY = (vx_in_per_s * s + vy_in_per_s * c) * dt_s;
+
+  x_.x_in += dX;
+  x_.y_in += dY;
+  x_.theta_rad = normalizeAngle(x_.theta_rad + omega_rad_per_s * dt_s);
+
+  // Jacobian F = d f / d x
+  double F[3][3];
+  mat3_identity(F);
+
+  // dX/dtheta = (-vx*sin(theta) - vy*cos(theta)) * dt
+  // dY/dtheta = ( vx*cos(theta) - vy*sin(theta)) * dt
+  F[0][2] = (-vx_in_per_s * s - vy_in_per_s * c) * dt_s;
+  F[1][2] = ( vx_in_per_s * c - vy_in_per_s * s) * dt_s;
+
+  propagateCovariance(F);
+  addProcessNoiseScaled(dt_s);</code></pre>
+            <p class="code-note">
+              This excerpt computes body-frame to global-frame motion increments and updates state.
+              The Jacobian terms <code>F[0][2]</code> and <code>F[1][2]</code> capture heading sensitivity.
+              Covariance propagation and process noise scaling are applied every prediction step.
+            </p>
+          </article>
+
+          <article class="snippet-card">
+            <p class="snippet-label">Snippet B — Covariance propagation (<code>EKF::propagateCovariance</code>)</p>
+            <pre><code>void EKF::propagateCovariance(const double F[3][3]) {
+  // P = F P F^T
+  double FP[3][3];
+  double FT[3][3];
+  double FPFt[3][3];
+
+  mat3_mul(F, P_, FP);
+  mat3_transpose(F, FT);
+  mat3_mul(FP, FT, FPFt);
+
+  for (int r = 0; r &lt; 3; ++r)
+    for (int c = 0; c &lt; 3; ++c)
+      P_[r][c] = FPFt[r][c];
+
+  symmetrizeP();
+  clampPDiag(1e-12);</code></pre>
+            <p class="code-note">
+              This is the explicit <code>P = F P F^T</code> sequence through fixed-size matrix helpers.
+              After propagation, covariance is symmetrized and diagonal-clamped for stability.
+              The implementation stays deterministic with static dimensions and no dynamic allocation.
+            </p>
+          </article>
+
+          <article class="snippet-card">
+            <p class="snippet-label">Snippet C — 2D GPS Joseph-form update (<code>EKF::update2D</code>)</p>
+            <pre><code>void EKF::update2D(const double z[2], const double h[2], const double H[2][3], const double R[2][2]) {
+  // residual r = z - h
+  double r[2] = { z[0] - h[0], z[1] - h[1] };
+
+  // S = H P H^T + R   (2x2)
+  double S[2][2] = { {0,0}, {0,0} };
+
+  for (int a = 0; a &lt; 2; ++a) {
+    for (int b = 0; b &lt; 2; ++b) {
+      double sum = 0.0;
+      for (int i = 0; i &lt; 3; ++i) {
+        for (int j = 0; j &lt; 3; ++j) {
+          sum += H[a][i] * P_[i][j] * H[b][j];
+        }
+      }
+      S[a][b] = sum + R[a][b];
+    }
+  }
+
+  // inv(S)
+  double invS[2][2];
+  double detS = 0.0;
+  if (!inv2x2(S, invS, &amp;detS)) {
+    // If S is singular (shouldn't happen with sane R), skip update safely.
+    return;
+  }
+  if (std::fabs(detS) &lt; 1e-12) return;
+
+  // K = P H^T inv(S)  =&gt; (3x2)
+  // First compute PHt = P H^T  =&gt; (3x2)
+  double PHt[3][2] = {};
+  for (int i = 0; i &lt; 3; ++i) {
+    for (int a = 0; a &lt; 2; ++a) {
+      double sum = 0.0;
+      for (int j = 0; j &lt; 3; ++j) {
+        sum += P_[i][j] * H[a][j];
+      }
+      PHt[i][a] = sum;
+    }
+  }
+
+  // K = PHt * invS
+  double K[3][2] = {};
+  for (int i = 0; i &lt; 3; ++i) {
+    for (int a = 0; a &lt; 2; ++a) {
+      K[i][a] = PHt[i][0] * invS[0][a] + PHt[i][1] * invS[1][a];
+    }
+  }
+
+  if (!gps_updates_theta_) {
+    K[2][0] = 0.0;
+    K[2][1] = 0.0;
+  }
+
+  // x = x + K r
+  x_.x_in += K[0][0] * r[0] + K[0][1] * r[1];
+  x_.y_in += K[1][0] * r[0] + K[1][1] * r[1];
+  x_.theta_rad = normalizeAngle(x_.theta_rad + (K[2][0] * r[0] + K[2][1] * r[1]));
+
+  // Joseph form:
+  // P = (I - K H) P (I - K H)^T + K R K^T
+  double I[3][3]; mat3_identity(I);
+
+  // KH = K(3x2) * H(2x3) = 3x3
+  double KH[3][3] = {};
+  for (int i = 0; i &lt; 3; ++i) {
+    for (int j = 0; j &lt; 3; ++j) {
+      KH[i][j] = K[i][0] * H[0][j] + K[i][1] * H[1][j];
+    }
+  }
+
+  double IminusKH[3][3];
+  mat3_sub(I, KH, IminusKH);
+
+  double tmp[3][3];
+  double IminusKH_T[3][3];
+  mat3_transpose(IminusKH, IminusKH_T);
+
+  mat3_mul(IminusKH, P_, tmp);
+  double newP[3][3];
+  mat3_mul(tmp, IminusKH_T, newP);
+
+  // Add K R K^T  (3x2)*(2x2)*(2x3)
+  // Compute KR = K * R  =&gt; 3x2
+  double KRm[3][2] = {};
+  for (int i = 0; i &lt; 3; ++i) {
+    KRm[i][0] = K[i][0] * R[0][0] + K[i][1] * R[1][0];
+    KRm[i][1] = K[i][0] * R[0][1] + K[i][1] * R[1][1];
+  }
+  // newP += KR * K^T
+  for (int i = 0; i &lt; 3; ++i) {
+    for (int j = 0; j &lt; 3; ++j) {
+      newP[i][j] += KRm[i][0] * K[j][0] + KRm[i][1] * K[j][1];
+    }</code></pre>
+            <p class="code-note">
+              The residual and innovation covariance are formed, then inverted through the guarded
+              2x2 inverse path. Kalman gain is computed as <code>PHt * invS</code>, with optional heading
+              decoupling via <code>gps_updates_theta_</code>. Covariance uses Joseph form for consistency.
+            </p>
+          </article>
+
+          <article class="snippet-card">
+            <p class="snippet-label">Snippet D — Manual matrix multiply helper (<code>EKF::mat3_mul</code>)</p>
+            <pre><code>void EKF::mat3_mul(const double A[3][3], const double B[3][3], double C[3][3]) {
+  for (int r = 0; r &lt; 3; ++r) {
+    for (int c = 0; c &lt; 3; ++c) {
+      double sum = 0.0;
+      for (int k = 0; k &lt; 3; ++k) sum += A[r][k] * B[k][c];
+      C[r][c] = sum;
+    }
+  }
+}</code></pre>
+            <p class="code-note">
+              Fixed-size triple nested loops make matrix multiplication explicit and predictable.
+              This pattern avoids hidden allocation overhead and keeps runtime behavior consistent.
+            </p>
+          </article>
+
+          <article class="snippet-card">
+            <p class="snippet-label">Snippet E — SensorFeeder loop (<code>SensorFeeder::step</code>)</p>
+            <pre><code>void SensorFeeder::step(EKF&amp; ekf) {
+  const bool isTank = (rotLat == nullptr);
+
+  // Step 0: dt
+  const uint32_t now_ms = pros::millis();
+  if (first_run_) {
+    reset();
+    return;
+  }
+
+  const uint32_t dt_ms = now_ms - prev_ms_;
+  const double dt_s = static_cast&lt;double&gt;(dt_ms) / 1000.0;
+
+  if (dt_s &lt; cfg_.dt_min_s || dt_s &gt; cfg_.dt_max_s) {
+    // Timing guard: resync if the loop timing is out of bounds.
+    prev_ms_ = now_ms;
+    prev_rotL_cd_ = rotL-&gt;get_position();
+    prev_rotR_cd_ = rotR-&gt;get_position();
+    prev_rotLat_cd_ = rotLat ? rotLat-&gt;get_position() : 0.0;
+    last_dt_s_ = 0.0;
+    return;
+  }
+
+  prev_ms_ = now_ms;
+  last_dt_s_ = dt_s;
+
+  // Step 1: Encoder deltas -&gt; distances
+  double dL_in = rotDeltaIn(*rotL, prev_rotL_cd_);
+  double dR_in = rotDeltaIn(*rotR, prev_rotR_cd_);
+  double dLat_in = 0.0;
+
+  if (!isTank &amp;&amp; rotLat) {
+    dLat_in = rotDeltaIn(*rotLat, prev_rotLat_cd_);
+  }
+
+  // Step 2: Compute body velocities
+  const double vx_inps = ((dL_in + dR_in) * 0.5) / dt_s;
+
+  double vy_meas_inps = 0.0;
+  if (!isTank) {
+    vy_meas_inps = dLat_in / dt_s;
+  }
+
+  last_vx_inps_ = vx_inps;
+  last_vy_inps_ = (isTank ? 0.0 : vy_meas_inps);
+
+  // Step 3: IMU heading + yaw rate
+  const double theta_meas_rad = readThetaRad();
+  const double omega_radps = readYawRateRadps();
+  last_theta_meas_rad_ = theta_meas_rad;
+  last_omega_radps_ = omega_radps;
+
+  // Step 4: Lateral wheel X-offset compensation (Holonomic only)
+  double vy_center_inps = 0.0;
+  if (!isTank) {
+    vy_center_inps = vy_meas_inps - (omega_radps * cfg_.lateral_wheel_x_offset_in);
+    last_vy_inps_ = vy_center_inps;
+  }
+
+  // Step 5: EKF Predict
+  if (isTank) {
+    ekf.predictTank(vx_inps, omega_radps, dt_s);
+  } else {
+    ekf.predictHolonomic(vx_inps, vy_center_inps, omega_radps, dt_s);
+  }
+
+  // Step 6: EKF Update (heading)
+  if (cfg_.use_imu_heading_update) {
+    double r_theta_rad2 = cfg_.r_theta_default_rad2;
+    if (cfg_.r_theta_override_rad2 &gt; 0.0) {
+      r_theta_rad2 = cfg_.r_theta_override_rad2;
+    }
+    ekf.updateHeading(theta_meas_rad, r_theta_rad2);
+  }
+
+  // Step 7: EKF Update (GPS) with rate limiting
+  if (cfg_.use_gps_update &amp;&amp; gps) {
+    const uint32_t gps_elapsed_ms = now_ms - last_gps_ms_;
+    if (cfg_.gps_min_period_ms == 0 || gps_elapsed_ms &gt;= cfg_.gps_min_period_ms) {
+      double x_in = 0.0;
+      double y_in = 0.0;
+      double r_x_in2 = 0.0;
+      double r_y_in2 = 0.0;
+
+      if (readGpsXY(x_in, y_in, r_x_in2, r_y_in2)) {
+        ekf.updateGPS(x_in, y_in, r_x_in2, r_y_in2);
+        last_gps_ms_ = now_ms;
+        last_gps_x_in_ = x_in;
+        last_gps_y_in_ = y_in;
+      }
+    }
+  }</code></pre>
+            <p class="code-note">
+              The loop enforces dt guardrails, converts encoder deltas to velocities, applies lateral
+              offset compensation, and selects tank or holonomic prediction. It also performs heading
+              updates and GPS updates with explicit rate limiting.
+            </p>
+          </article>
+
+          <article class="snippet-card">
+            <p class="snippet-label">Snippet F — GPS RMS gating and variance scaling (<code>readGpsXY</code>)</p>
+            <pre><code>// Default/fallback variance (in^2)
+double R_in2 = cfg_.r_gps_x_default_in2;
+if (R_in2 &lt;= 0.0) R_in2 = 16.0;
+
+if (cfg_.gps_use_rms_error) {
+const double rms_m = gps-&gt;get_error();  // meters RMS (scalar)
+if (!std::isfinite(rms_m) || rms_m &lt;= 0.0) return false;
+
+// Gate out bad GPS
+if (rms_m &gt; cfg_.gps_rms_max_m) return false;
+
+const double rms_m_clamped =
+std::fmax(cfg_.gps_rms_min_m, std::fmin(rms_m, cfg_.gps_rms_max_m));
+
+const double rms_in = rms_m_clamped * kMetersToInches;
+const double R_from_rms_in2 = rms_in * rms_in;
+
+R_in2 = std::fmax(R_in2, R_from_rms_in2);
+
+// Clamp final
+R_in2 = std::fmax(cfg_.gps_r_floor_in2, std::fmin(R_in2, cfg_.gps_r_ceiling_in2));
+} else {
+if (cfg_.r_gps_x_fixed_in2 &gt; 0.0) R_in2 = cfg_.r_gps_x_fixed_in2;
+}
+
+r_x_in2 = R_in2;
+r_y_in2 = R_in2;
+return true;</code></pre>
+            <p class="code-note">
+              GPS RMS error is read and validated, then used to gate poor fixes and scale measurement
+              variance. Final covariance is clamped between floor and ceiling bounds before update use.
+            </p>
+          </article>
+        </article>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; 2026 Jorge M. Guzman</p>
+      <p>Autonomous systems software engineering portfolio.</p>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Holonomic Pure Pursuit + Pose Lock | Jorge M. Guzman</title>
+    <meta
+      name="description"
+      content="Holonomic trajectory tracking and pose lock project by Jorge M. Guzman with dynamic lookahead and smooth transition handling."
+    />
+    <meta property="og:title" content="Holonomic Pure Pursuit + Pose Lock | Jorge M. Guzman" />
+    <meta
+      property="og:description"
+      content="Dynamic lookahead, heading decoupling, and pose-lock strategy for reliable endpoint convergence."
+    />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://jorgeguzman.github.io/projects/hpp.html" />
+    <meta property="og:image" content="https://jorgeguzman.github.io/assets/jorge-placeholder.svg" />
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="../index.html#top" aria-label="Go to homepage top">
+        <span class="brand-mark">JG</span>
+        <span>Jorge M. Guzman</span>
+      </a>
+      <nav class="main-nav" aria-label="Primary navigation">
+        <a href="../index.html#projects">Projects</a>
+        <a href="../index.html#capabilities">Capabilities</a>
+        <a href="../index.html#experience">Experience</a>
+        <a href="../index.html#education">Education</a>
+        <a href="../index.html#contact">Contact</a>
+      </nav>
+    </header>
+
+    <main class="container page-title-wrap">
+      <a class="back-link" href="../index.html#projects">← Back to Projects</a>
+      <h1>Holonomic Pure Pursuit + Pose Lock</h1>
+      <p class="lead">
+        Geometric trajectory tracking with dynamic lookahead and endpoint pose locking to improve
+        repeatability near final approach.
+      </p>
+
+      <section class="section project-grid" aria-labelledby="overview-title">
+        <article class="card">
+          <h2 id="overview-title">Overview</h2>
+          <p>
+            This controller combines path-following behavior for mid-course motion with a terminal
+            pose-lock mode for precise final alignment in both translation and heading.
+          </p>
+        </article>
+
+        <article class="card">
+          <h2>What I Built</h2>
+          <ul class="bullets">
+            <li>Implemented pure pursuit for holonomic trajectory tracking with arc-length progression.</li>
+            <li>Added dynamic lookahead scaling to balance responsiveness and smoothness.</li>
+            <li>Decoupled heading management from translational tracking when needed.</li>
+            <li>Implemented pose-lock logic near goal to settle residual position and heading error.</li>
+            <li>Applied S-curve modifications to reduce abrupt command transitions.</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h2>Technical Notes</h2>
+          <div class="meta">
+            <div class="meta-row"><strong>Controller Type</strong><span>Geometric tracking with adaptive preview.</span></div>
+            <div class="meta-row"><strong>Inputs</strong><span>Current pose, arc-length reference, path geometry.</span></div>
+            <div class="meta-row"><strong>Endpoint Logic</strong><span>Pose-lock mode transitions based on near-goal thresholds.</span></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Results & Validation</h2>
+          <ul class="bullets">
+            <li>Smoother approach behavior near curve transitions than fixed-lookahead baselines.</li>
+            <li>Improved endpoint consistency with pose-lock activation.</li>
+            <li>Cross-track RMS: [placeholder metric].</li>
+            <li>Final pose error envelope: [placeholder metric].</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h2>Code Snippets</h2>
+          <article class="snippet-card">
+            <p class="snippet-label">Lookahead and Mode Logic (placeholder)</p>
+            <pre><code>// Replace with real pure pursuit / pose lock excerpt.
+double L = base_lookahead + k_speed * speed;
+if (near_goal(distance_to_goal, heading_error)) {
+  mode = ControlMode::PoseLock;
+}
+
+if (mode == ControlMode::PoseLock) {
+  cmd = computePoseLockCommand(state, goal, gains);
+}</code></pre>
+            <p class="code-note">
+              Paste a real excerpt from your controller to show dynamic lookahead selection and final
+              pose-lock mode switching.
+            </p>
+          </article>
+        </article>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; 2026 Jorge M. Guzman</p>
+      <p>Autonomous systems software engineering portfolio.</p>
+    </footer>
+  </body>
+</html>

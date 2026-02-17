@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Autonomous Navigation & Control Stack | Jorge M. Guzman</title>
+    <meta
+      name="description"
+      content="Autonomous navigation and control stack project by Jorge M. Guzman, focused on modular architecture and interface boundaries."
+    />
+    <meta property="og:title" content="Autonomous Navigation & Control Stack | Jorge M. Guzman" />
+    <meta
+      property="og:description"
+      content="Pipeline architecture separating estimation, planning, smoothing, sampling, and control."
+    />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://jorgeguzman.github.io/projects/stack.html" />
+    <meta property="og:image" content="https://jorgeguzman.github.io/assets/jorge-placeholder.svg" />
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="../index.html#top" aria-label="Go to homepage top">
+        <span class="brand-mark">JG</span>
+        <span>Jorge M. Guzman</span>
+      </a>
+      <nav class="main-nav" aria-label="Primary navigation">
+        <a href="../index.html#projects">Projects</a>
+        <a href="../index.html#capabilities">Capabilities</a>
+        <a href="../index.html#experience">Experience</a>
+        <a href="../index.html#education">Education</a>
+        <a href="../index.html#contact">Contact</a>
+      </nav>
+    </header>
+
+    <main class="container page-title-wrap">
+      <a class="back-link" href="../index.html#projects">← Back to Projects</a>
+      <h1>Autonomous Navigation & Control Stack</h1>
+      <p class="lead">
+        A modular autonomy architecture that cleanly separates estimation, planning,
+        smoothing, sampling, and control into independently tunable subsystems.
+      </p>
+
+      <section class="section project-grid" aria-labelledby="overview-title">
+        <article class="card">
+          <h2 id="overview-title">Overview</h2>
+          <p>
+            This project formalized subsystem contracts so trajectory generation and tracking could evolve
+            without destabilizing state estimation or hardware interfaces.
+          </p>
+        </article>
+
+        <article class="card">
+          <h2>What I Built</h2>
+          <ul class="bullets">
+            <li>Defined module boundaries for estimator, planner, smoother, sampler, and controller stages.</li>
+            <li>Implemented parameter structs to decouple tuning values from algorithmic logic.</li>
+            <li>Standardized data handoff formats for pose, path, and control references.</li>
+            <li>Added deterministic scheduling assumptions for predictable end-to-end latency.</li>
+            <li>Introduced clear ownership of coordinate transforms and unit conventions.</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h2>Technical Notes</h2>
+          <div class="meta">
+            <div class="meta-row"><strong>Core Pattern</strong><span>Interface-first modular design.</span></div>
+            <div class="meta-row"><strong>Primary Language</strong><span>C++ with strongly typed structs and explicit units.</span></div>
+            <div class="meta-row"><strong>Control Flow</strong><span>Estimation → planning → smoothing → sampling → control.</span></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Results & Validation</h2>
+          <ul class="bullets">
+            <li>Subsystem integration regressions reduced through stable interfaces.</li>
+            <li>Runtime behavior remained consistent under repeated tuning cycles.</li>
+            <li>Latency budget: [placeholder metric].</li>
+            <li>Path execution accuracy improvement: [placeholder metric].</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h2>Code Snippets</h2>
+          <article class="snippet-card">
+            <p class="snippet-label">Pipeline Interface Sketch (placeholder)</p>
+            <pre><code>// Replace with real stack module excerpt from your codebase.
+struct PlannerOutput {
+  Path path;
+  Trajectory trajectory;
+  ControlHints hints;
+};
+
+ControlCommand runController(const EstimatorState&amp; state,
+                             const TrajectorySample&amp; sample,
+                             const ControlGains&amp; gains);</code></pre>
+            <p class="code-note">
+              This placeholder indicates where a real interface excerpt should be pasted to demonstrate
+              module boundaries and decoupled tuning structures.
+            </p>
+          </article>
+        </article>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; 2026 Jorge M. Guzman</p>
+      <p>Autonomous systems software engineering portfolio.</p>
+    </footer>
+  </body>
+</html>

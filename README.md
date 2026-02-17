@@ -1,62 +1,78 @@
-# Jorge Guzmán Portfolio (GitHub Pages)
+# Jorge M. Guzman Portfolio (GitHub Pages)
 
-Static portfolio site built with plain HTML + CSS for `jorgeguzman.github.io`.
+Static portfolio for robotics, aerospace, and automation internship applications.
+Built with plain `HTML + CSS` only.
 
-## Structure
+## Files
 
-- `index.html`: Main portfolio page with hero, about, skills, projects, experience, and contact sections.
-- `style.css`: All site styling (dark mode, gradients, cards, responsive layout).
-- `assets/`: Static assets.
-- `assets/jorge-placeholder.svg`: Placeholder profile/hero image.
-- `assets/favicon.svg`: Favicon placeholder.
-- `projects/`: Project detail pages.
-- `projects/project-template.html`: Reusable template for new project pages.
+- `index.html`: Main landing page (hero, impact, projects, capabilities, experience, education, contact).
+- `style.css`: Global styling for all pages.
+- `projects/ekf.html`: Featured EKF project page with source-based code snippets.
+- `projects/stack.html`: Autonomous navigation stack project page.
+- `projects/hpp.html`: Holonomic pure pursuit + pose lock project page.
+- `projects/sim.html`: Simulation and verification project page.
+- `assets/Jorge_Guzman_Resume.pdf`: Resume file used by all “Download Resume” links.
+- `assets/favicon.svg`, `assets/jorge-placeholder.svg`: Site visual placeholders.
 
 ## Edit Content
 
-1. Update personal info in `index.html`:
-- Hero name/tagline
-- Resume, GitHub, and LinkedIn links
-- About text
-- Contact email and profile links
+1. Update homepage copy in `index.html`.
+2. Update project page details in `projects/*.html`.
+3. Keep navigation links consistent across all pages.
+4. Keep section IDs (`#projects`, `#capabilities`, etc.) unchanged unless you also update nav links.
 
-2. Update projects in `index.html`:
-- Edit the project cards under the `Projects` section.
-- Keep each card link pointed to a file in `projects/*.html`.
+## Resume PDF
 
-3. Add a new project page:
-- Copy `projects/project-template.html`.
-- Rename it (example: `projects/my-new-project.html`).
-- Replace placeholder sections with your project details.
-- Add the card + link in `index.html`.
+1. Replace `assets/Jorge_Guzman_Resume.pdf` with your real resume file.
+2. Keep the same filename to avoid changing links.
 
-4. Replace placeholders:
-- Swap `assets/jorge-placeholder.svg` with your own image.
-- Replace `assets/favicon.svg` with your favicon if desired.
-- Add your real resume PDF and link it from the hero button.
+## EKF Snippets (projects/ekf.html)
 
-## GitHub Pages (How This Repo Publishes)
+`projects/ekf.html` contains excerpt cards for:
 
-For a repository named `jorgeguzman.github.io`, GitHub Pages publishes from the root of the default branch.
+- Holonomic prediction Jacobian
+- Covariance propagation
+- 2D GPS Joseph update
+- `mat3_mul`
+- `SensorFeeder::step`
+- `readGpsXY` RMS gating
 
-Typical flow:
+To expand or refresh snippets:
 
-1. Commit your changes.
+1. Open `projects/ekf.html`.
+2. Update the corresponding snippet card `<pre><code>...</code></pre>` blocks.
+3. Paste exact excerpts from your source files without rewriting logic.
+4. Keep explanations short and limited to behavior visible in the snippet.
+
+If you keep source files in this repo, recommended names are:
+
+- `EKF.hpp`
+- `EKF.cpp`
+- `sensor_feeder.hpp`
+- `Sensor_Feeder.cpp`
+
+## GitHub Pages Deployment
+
+This repo is a user site (`jorgeguzman.github.io`), so GitHub Pages serves from the root of the default branch.
+
+1. Commit changes.
 2. Push to `main`.
-3. Wait ~1-3 minutes for deployment.
+3. Wait 1 to 3 minutes.
 4. Open `https://jorgeguzman.github.io/`.
 
 If needed, verify in GitHub:
+
 - `Settings` -> `Pages`
-- Source should be set to `Deploy from a branch`
-- Branch should be `main` and folder `/ (root)`
+- Source: `Deploy from a branch`
+- Branch: `main`
+- Folder: `/ (root)`
 
 ## Local Preview
 
-Open `index.html` directly in a browser, or run a simple local server from the repo root:
+Run from repo root:
 
 ```bash
 python3 -m http.server 8080
 ```
 
-Then visit `http://localhost:8080`.
+Open `http://localhost:8080`.

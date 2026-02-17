@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simulation & Verification Framework | Jorge M. Guzman</title>
+    <meta
+      name="description"
+      content="Simulation and verification framework project by Jorge M. Guzman for noise injection, parameter sweeps, and stress testing."
+    />
+    <meta property="og:title" content="Simulation & Verification Framework | Jorge M. Guzman" />
+    <meta
+      property="og:description"
+      content="Offline validation harness for stochastic noise injection, unit tests, and regression checks."
+    />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://jorgeguzman.github.io/projects/sim.html" />
+    <meta property="og:image" content="https://jorgeguzman.github.io/assets/jorge-placeholder.svg" />
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="../index.html#top" aria-label="Go to homepage top">
+        <span class="brand-mark">JG</span>
+        <span>Jorge M. Guzman</span>
+      </a>
+      <nav class="main-nav" aria-label="Primary navigation">
+        <a href="../index.html#projects">Projects</a>
+        <a href="../index.html#capabilities">Capabilities</a>
+        <a href="../index.html#experience">Experience</a>
+        <a href="../index.html#education">Education</a>
+        <a href="../index.html#contact">Contact</a>
+      </nav>
+    </header>
+
+    <main class="container page-title-wrap">
+      <a class="back-link" href="../index.html#projects">← Back to Projects</a>
+      <h1>Simulation & Verification Framework</h1>
+      <p class="lead">
+        Offline framework used to validate estimation, planning, and control behavior under noisy,
+        non-ideal scenarios before running on hardware.
+      </p>
+
+      <section class="section project-grid" aria-labelledby="overview-title">
+        <article class="card">
+          <h2 id="overview-title">Overview</h2>
+          <p>
+            This framework provides repeatable stress scenarios to expose integration faults,
+            coordinate-frame mistakes, and tuning fragility early in the development loop.
+          </p>
+        </article>
+
+        <article class="card">
+          <h2>What I Built</h2>
+          <ul class="bullets">
+            <li>Built offline simulation harness for fast autonomy iteration without hardware dependency.</li>
+            <li>Injected stochastic sensor noise to test estimator and controller resilience.</li>
+            <li>Added parameter sweep workflows to map stability regions and edge-case behavior.</li>
+            <li>Implemented coordinate transform and unit-consistency verification tests.</li>
+            <li>Added stress-test scenarios for timing jitter and delayed measurement conditions.</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h2>Technical Notes</h2>
+          <div class="meta">
+            <div class="meta-row"><strong>Validation Scope</strong><span>Estimator update integrity, planning continuity, tracking convergence.</span></div>
+            <div class="meta-row"><strong>Methods</strong><span>Noise injection, sweeps, deterministic replay, unit-level checks.</span></div>
+            <div class="meta-row"><strong>Primary Goal</strong><span>Catch failures before hardware tests to reduce iteration cost.</span></div>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Results & Validation</h2>
+          <ul class="bullets">
+            <li>Reduced time spent debugging integration issues on physical robot runs.</li>
+            <li>Identified brittle parameter regions before match deployment.</li>
+            <li>Regression suite execution time: [placeholder metric].</li>
+            <li>Coverage of stress scenarios: [placeholder metric].</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h2>Code Snippets</h2>
+          <article class="snippet-card">
+            <p class="snippet-label">Simulation Harness Loop (placeholder)</p>
+            <pre><code>// Replace with real simulation harness excerpt.
+for (const auto&amp; scenario : scenarios) {
+  applyNoiseModel(state, scenario.noise);
+  runAutonomyStep(state, scenario.dt);
+  recordMetrics(metrics, state, scenario);
+}
+
+assert(metrics.maxPoseError &lt; threshold);</code></pre>
+            <p class="code-note">
+              Replace this placeholder with an actual harness excerpt that shows noise injection and
+              validation assertions.
+            </p>
+          </article>
+        </article>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; 2026 Jorge M. Guzman</p>
+      <p>Autonomous systems software engineering portfolio.</p>
+    </footer>
+  </body>
+</html>
