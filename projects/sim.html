@@ -3,19 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Simulation & Verification Framework | Jorge M. Guzman</title>
+    <title>Standalone EKF Validation &amp; Simulation Environment | Jorge M. Guzmán</title>
     <meta
       name="description"
-      content="Simulation and verification framework project by Jorge M. Guzman for noise injection, parameter sweeps, and stress testing."
+      content="Standalone deterministic EKF validation framework for offline ground-truth simulation, noise injection, debug tracing, and final error verification before hardware deployment."
     />
-    <meta property="og:title" content="Simulation & Verification Framework | Jorge M. Guzman" />
+    <meta property="og:title" content="Standalone EKF Validation &amp; Simulation Environment | Jorge M. Guzmán" />
     <meta
       property="og:description"
-      content="Offline validation harness for stochastic noise injection, unit tests, and regression checks."
+      content="Deterministic offline harness used to stress-test EKF prediction/correction behavior with synthetic encoder, gyro, and GPS noise."
     />
     <meta property="og:type" content="article" />
     <meta property="og:url" content="https://jorgeguzman.github.io/projects/sim.html" />
-    <meta property="og:image" content="https://jorgeguzman.github.io/assets/jorge-placeholder.svg" />
+    <meta property="og:image" content="/assets/og-cover.png" />
     <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
     <link rel="stylesheet" href="../style.css" />
   </head>
@@ -23,7 +23,7 @@
     <header class="site-header">
       <a class="brand" href="../index.html#top" aria-label="Go to homepage top">
         <span class="brand-mark">JG</span>
-        <span>Jorge M. Guzman</span>
+        <span>Jorge M. Guzmán</span>
       </a>
       <nav class="main-nav" aria-label="Primary navigation">
         <a href="../index.html#projects">Projects</a>
@@ -36,66 +36,384 @@
 
     <main class="container page-title-wrap">
       <a class="back-link" href="../index.html#projects">← Back to Projects</a>
-      <h1>Simulation & Verification Framework</h1>
+      <h1>Standalone EKF Validation &amp; Simulation Environment</h1>
       <p class="lead">
-        Offline framework used to validate estimation, planning, and control behavior under noisy,
-        non-ideal scenarios before running on hardware.
+        Deterministic offline validation framework used to stress-test the Extended Kalman Filter
+        before hardware deployment.
       </p>
 
       <section class="section project-grid" aria-labelledby="overview-title">
         <article class="card">
           <h2 id="overview-title">Overview</h2>
           <p>
-            This framework provides repeatable stress scenarios to expose integration faults,
-            coordinate-frame mistakes, and tuning fragility early in the development loop.
+            This environment runs the EKF independently of physical hardware using a simulated
+            ground-truth trajectory. Synthetic noise is injected into encoder, gyro, and GPS
+            signals, and the filter processes these noisy measurements in a fixed-step loop. Final
+            estimated state is compared against ground truth to measure error and convergence under
+            repeatable scenarios.
           </p>
         </article>
 
         <article class="card">
           <h2>What I Built</h2>
           <ul class="bullets">
-            <li>Built offline simulation harness for fast autonomy iteration without hardware dependency.</li>
-            <li>Injected stochastic sensor noise to test estimator and controller resilience.</li>
-            <li>Added parameter sweep workflows to map stability regions and edge-case behavior.</li>
-            <li>Implemented coordinate transform and unit-consistency verification tests.</li>
-            <li>Added stress-test scenarios for timing jitter and delayed measurement conditions.</li>
+            <li>Built standalone EKF driver loop in <code>main.cpp</code>.</li>
+            <li>Simulated ground truth motion and sensor measurements.</li>
+            <li>Injected configurable noise into measurement channels.</li>
+            <li>Logged estimator internal state for debugging.</li>
+            <li>Compared EKF output against ground truth trajectory.</li>
+            <li>Printed final error metrics and validation summary.</li>
           </ul>
         </article>
 
         <article class="card">
           <h2>Technical Notes</h2>
           <div class="meta">
-            <div class="meta-row"><strong>Validation Scope</strong><span>Estimator update integrity, planning continuity, tracking convergence.</span></div>
-            <div class="meta-row"><strong>Methods</strong><span>Noise injection, sweeps, deterministic replay, unit-level checks.</span></div>
-            <div class="meta-row"><strong>Primary Goal</strong><span>Catch failures before hardware tests to reduce iteration cost.</span></div>
+            <div class="meta-row"><strong>Simulation Model</strong><span>Ground-truth state propagation from a predefined square trajectory.</span></div>
+            <div class="meta-row"><strong>Noise Injection</strong><span>Stochastic perturbation applied to encoder, IMU yaw rate, GPS position, and heading channels.</span></div>
+            <div class="meta-row"><strong>Validation Metrics</strong><span>Final position error, heading error, total distance traveled, and convergence behavior.</span></div>
+            <div class="meta-row"><strong>Determinism</strong><span>Fixed timestep loop using <code>const double dt = 0.02</code> for repeatable replay.</span></div>
           </div>
         </article>
 
         <article class="card">
-          <h2>Results & Validation</h2>
-          <ul class="bullets">
-            <li>Reduced time spent debugging integration issues on physical robot runs.</li>
-            <li>Identified brittle parameter regions before match deployment.</li>
-            <li>Regression suite execution time: [placeholder metric].</li>
-            <li>Coverage of stress scenarios: [placeholder metric].</li>
-          </ul>
+          <h2>Results &amp; Validation</h2>
+          <figure class="results-figure">
+            <img
+              src="./ekf-validation-output.png"
+              alt="Console output screenshot from standalone EKF simulation run"
+              loading="lazy"
+            />
+          </figure>
+
+          <p class="snippet-label">Example Test Output:</p>
+          <pre class="console-output"><code>Final Position Error: ~0.30 in
+Total Distance Traveled: 153.0 in
+Heading Estimate: 90.7° vs 90.2° ground truth</code></pre>
+
+          <p class="code-note">
+            The estimator maintained sub-inch positional accuracy over a 153-inch trajectory under
+            noisy conditions.
+          </p>
         </article>
 
         <article class="card">
           <h2>Code Snippets</h2>
-          <article class="snippet-card">
-            <p class="snippet-label">Simulation Harness Loop (placeholder)</p>
-            <pre><code>// Replace with real simulation harness excerpt.
-for (const auto&amp; scenario : scenarios) {
-  applyNoiseModel(state, scenario.noise);
-  runAutonomyStep(state, scenario.dt);
-  recordMetrics(metrics, state, scenario);
-}
 
-assert(metrics.maxPoseError &lt; threshold);</code></pre>
+          <article class="snippet-card">
+            <p class="snippet-label">Snippet A — Simulation Loop (<code>main.cpp</code>)</p>
+            <pre><code>    double current_time = 0.0;
+    const double sim_duration = 15.0;  // Simulate 15 seconds
+    const double dt = 0.02;           // 50Hz (every 20ms)
+
+    std::cout &lt;&lt; &quot;\nStarting simulation...&quot; &lt;&lt; std::endl;
+    std::cout &lt;&lt; &quot;Duration: &quot; &lt;&lt; sim_duration &lt;&lt; &quot; seconds&quot; &lt;&lt; std::endl;
+    std::cout &lt;&lt; &quot;Update rate: &quot; &lt;&lt; (1.0/dt) &lt;&lt; &quot; Hz&quot; &lt;&lt; std::endl;
+    std::cout &lt;&lt; &quot;Trajectory: Square movement (24in sides)&quot; &lt;&lt; std::endl;
+    std::cout &lt;&lt; &quot;========================================&quot; &lt;&lt; std::endl;
+
+    // Reset debug counters
+    aon::debug_reset_counters();
+
+    // Main simulation loop
+    int step_count = 0;
+    while (current_time &lt; sim_duration) {
+        // Generate simulated data for this timestep
+        aon::SimulatedSensorData sensor_data = aon::generate_sensor_data(current_time);
+
+        // Read sensor status for debug
+        aon::SensorStatus status = aon::get_sensor_status(sensor_data);
+
+        // Feed EKF with sensor data
+        aon::feed_ekf_sensors_simulated(ekf, sensor_data);
+
+        // Update debug system
+        aon::debug_update(ekf, status);
+</code></pre>
             <p class="code-note">
-              Replace this placeholder with an actual harness excerpt that shows noise injection and
-              validation assertions.
+              The loop advances with a fixed <code>dt</code>, generates simulated sensors each step,
+              and routes them through a single EKF feed/update path. This is the deterministic test
+              driver used for repeatable validation runs.
+            </p>
+          </article>
+
+          <article class="snippet-card">
+            <p class="snippet-label">Snippet B — Ground Truth vs Estimate Comparison (<code>main.cpp</code>)</p>
+            <pre><code>    std::cout &lt;&lt; &quot;\nFINAL COMPARISON:&quot; &lt;&lt; std::endl;
+    std::cout &lt;&lt; &quot;Ground Truth: (&quot; &lt;&lt; std::fixed &lt;&lt; std::setprecision(1)
+              &lt;&lt; final_sensor.gps_x/25.4 &lt;&lt; &quot;in, &quot;
+              &lt;&lt; final_sensor.gps_y/25.4 &lt;&lt; &quot;in, &quot;
+              &lt;&lt; final_sensor.gps_heading &lt;&lt; &quot;°)&quot; &lt;&lt; std::endl;
+    std::cout &lt;&lt; &quot;EKF Estimate: (&quot; &lt;&lt; std::setprecision(1)
+              &lt;&lt; final_state.x &lt;&lt; &quot;in, &quot; &lt;&lt; final_state.y &lt;&lt; &quot;in, &quot;
+              &lt;&lt; (final_state.theta * 180.0 / M_PI) &lt;&lt; &quot;°)&quot; &lt;&lt; std::endl;
+
+    double final_error = std::sqrt(std::pow(final_state.x - final_sensor.gps_x/25.4, 2) +
+                                 std::pow(final_state.y - final_sensor.gps_y/25.4, 2));
+    std::cout &lt;&lt; &quot;Final Position Error: &quot; &lt;&lt; std::setprecision(2) &lt;&lt; final_error &lt;&lt; &quot;in&quot; &lt;&lt; std::endl;
+    std::cout &lt;&lt; &quot;Total Distance Traveled: &quot; &lt;&lt; std::setprecision(1)
+              &lt;&lt; ekf.get_distance_traveled_in() &lt;&lt; &quot;in&quot; &lt;&lt; std::endl;</code></pre>
+            <p class="code-note">
+              Final ground-truth pose and EKF state are printed side-by-side, then Euclidean
+              position error is computed. This is the direct end-of-run accuracy check used for
+              validation reporting.
+            </p>
+          </article>
+
+          <article class="snippet-card">
+            <p class="snippet-label">Snippet C — Debug Logging (<code>ekf_debug.cpp</code>)</p>
+            <pre><code>void debug_print_ekf_state(const EKF&amp; ekf, const SensorStatus&amp; sensor_status) {
+    if (!EKF_PASSIVE_MODE) return;
+
+    auto now = std::chrono::steady_clock::now();
+    auto duration = now.time_since_epoch();
+    uint64_t current_time_ms = std::chrono::duration_cast&lt;std::chrono::milliseconds&gt;(duration).count();
+
+    if (current_time_ms - last_debug_print &lt; DEBUG_PRINT_INTERVAL_MS) {
+        return;
+    }
+
+    last_debug_print = current_time_ms;
+    debug_update_count++;
+
+    EKFState state = ekf.get_state();
+    double distance = ekf.get_distance_traveled_in();
+    std::string sensor_health = format_sensor_health(sensor_status);
+
+    std::cout &lt;&lt; &quot;[EKF] Pose=(x=&quot; &lt;&lt; format_double(state.x) &lt;&lt; &quot;in, &quot;
+              &lt;&lt; &quot;y=&quot; &lt;&lt; format_double(state.y) &lt;&lt; &quot;in, &quot;
+              &lt;&lt; &quot;θ=&quot; &lt;&lt; format_angle_deg(state.theta) &lt;&lt; &quot;) &quot;
+              &lt;&lt; &quot;v=&quot; &lt;&lt; format_double(state.v) &lt;&lt; &quot;in/s  &quot;
+              &lt;&lt; &quot;dist=&quot; &lt;&lt; format_double(distance) &lt;&lt; &quot;in  &quot;
+              &lt;&lt; &quot;SENSORS=&quot; &lt;&lt; sensor_health
+              &lt;&lt; &quot;  updates=&quot; &lt;&lt; debug_update_count &lt;&lt; std::endl;
+}</code></pre>
+            <p class="code-note">
+              Internal EKF state, traveled distance, and sensor-health summary are emitted on a fixed
+              debug interval. This compact stream supports rapid tuning and regression checks.
+            </p>
+          </article>
+
+          <article class="snippet-card">
+            <p class="snippet-label">Snippet D — Noise Injection / Sensor Modeling (<code>sensor_feeder.cpp</code>)</p>
+            <pre><code>    // Add realistic noise
+    data.encoderS_vel += (rand() % 200 - 100) / 100.0;  // ±1 RPM noise
+    data.encoderM_angle += (rand() % 20 - 10) / 10.0;   // ±1° noise
+    data.imu_yaw_rate += (rand() % 100 - 50) / 10000.0; // ±0.005 rad/s noise
+    data.gps_x += (rand() % 100 - 50) / 10.0;          // ±5mm noise
+    data.gps_y += (rand() % 100 - 50) / 10.0;          // ±5mm noise
+    data.gps_heading += (rand() % 20 - 10) / 10.0;     // ±1° noise</code></pre>
+            <p class="code-note">
+              Synthetic random perturbations are applied directly to each measurement channel. This
+              gives controlled stochastic stress while keeping the scenario generation deterministic
+              at the loop level.
+            </p>
+          </article>
+
+          <article class="snippet-card">
+            <p class="snippet-label">Snippet E — Validation Completion Output (<code>main.cpp</code>)</p>
+            <pre><code>    // Final results
+    std::cout &lt;&lt; &quot;\n=== SIMULATION COMPLETE ===&quot; &lt;&lt; std::endl;
+    aon::debug_print_performance(ekf);
+
+    // Final state vs ground truth
+    aon::SimulatedSensorData final_sensor = aon::generate_sensor_data(sim_duration);
+    aon::EKFState final_state = ekf.get_state();
+
+    std::cout &lt;&lt; &quot;\nFINAL COMPARISON:&quot; &lt;&lt; std::endl;
+    std::cout &lt;&lt; &quot;Ground Truth: (&quot; &lt;&lt; std::fixed &lt;&lt; std::setprecision(1)
+              &lt;&lt; final_sensor.gps_x/25.4 &lt;&lt; &quot;in, &quot;
+              &lt;&lt; final_sensor.gps_y/25.4 &lt;&lt; &quot;in, &quot;
+              &lt;&lt; final_sensor.gps_heading &lt;&lt; &quot;°)&quot; &lt;&lt; std::endl;
+    std::cout &lt;&lt; &quot;EKF Estimate: (&quot; &lt;&lt; std::setprecision(1)
+              &lt;&lt; final_state.x &lt;&lt; &quot;in, &quot; &lt;&lt; final_state.y &lt;&lt; &quot;in, &quot;
+              &lt;&lt; (final_state.theta * 180.0 / M_PI) &lt;&lt; &quot;°)&quot; &lt;&lt; std::endl;
+
+    double final_error = std::sqrt(std::pow(final_state.x - final_sensor.gps_x/25.4, 2) +
+                                 std::pow(final_state.y - final_sensor.gps_y/25.4, 2));
+    std::cout &lt;&lt; &quot;Final Position Error: &quot; &lt;&lt; std::setprecision(2) &lt;&lt; final_error &lt;&lt; &quot;in&quot; &lt;&lt; std::endl;
+    std::cout &lt;&lt; &quot;Total Distance Traveled: &quot; &lt;&lt; std::setprecision(1)
+              &lt;&lt; ekf.get_distance_traveled_in() &lt;&lt; &quot;in&quot; &lt;&lt; std::endl;
+
+    std::cout &lt;&lt; &quot;\nTest completed successfully!&quot; &lt;&lt; std::endl;</code></pre>
+            <p class="code-note">
+              The test ends with explicit completion markers and a final comparison block. This makes
+              each run easy to parse and supports fast iteration without hardware in the loop.
+            </p>
+          </article>
+
+          <article class="snippet-card">
+            <p class="snippet-label">Reference — Sensor Feed dt Guard + Predict/Update Path (<code>sensor_feeder.cpp</code>)</p>
+            <pre><code>    double dt_s = (current_time_ms - prev_update_time_ms) / 1000.0;
+
+    if (dt_s &lt;= 0.0 || dt_s &gt; 0.1) {
+        prev_update_time_ms = current_time_ms;
+        return; // Ignore invalid dt
+    }
+
+    // Measurement variables
+    double v_inps = 0.0;  // Velocity in inches/sec
+    double omega_rad_s = 0.0;
+    bool have_v = false;
+    bool have_omega = false;
+
+    // 1. Read linear speed from encoderS
+    if (UsingEncoders &amp;&amp; sensor_data.encoderS_ok) {
+        double rev_per_min = sensor_data.encoderS_vel; // RPM
+        double rev_per_sec = rev_per_min / 60.0;
+        v_inps = rotation_to_linear_in(rev_per_sec); // Now in inches/sec
+        have_v = true;
+    }
+
+    // 2. Read rotation from encoderM or IMU
+    if (UsingEncoders &amp;&amp; sensor_data.encoderM_ok) {
+        double dangle_deg = sensor_data.encoderM_angle - prev_encoderM_angle;
+        double dangle_rad = rotation_to_rad(dangle_deg);
+        omega_rad_s = dangle_rad / dt_s;
+        have_omega = true;
+        prev_encoderM_angle = sensor_data.encoderM_angle;
+    } else if (UsingIMU &amp;&amp; sensor_data.imu_ok) {
+        omega_rad_s = sensor_data.imu_yaw_rate; // use Z axis for yaw
+        have_omega = true;
+    }
+
+    // 3. EKF prediction from odometry
+    if (have_v &amp;&amp; have_omega) {
+        ekf.predict_from_odometry(v_inps, omega_rad_s, dt_s);
+    }
+
+    // 4. Sensor corrections
+
+    // Gyroscope correction (if available)
+    if (UsingIMU &amp;&amp; sensor_data.imu_ok) {
+        ekf.correct_with_gyro(sensor_data.imu_yaw_rate, GYRO_VAR);
+    }
+
+    // Encoder correction (delta measurements)
+    if (UsingEncoders &amp;&amp; sensor_data.encoderS_ok &amp;&amp; sensor_data.encoderM_ok) {
+        double ds_rev = (sensor_data.encoderS_vel / 60.0) * dt_s; // RPM * dt_s = rev
+        double ds_in = rotation_to_linear_in(ds_rev);
+
+        double dtheta_deg = (sensor_data.encoderM_angle - prev_encoderM_angle);
+        double dtheta_rad = rotation_to_rad(dtheta_deg);
+
+        ekf.correct_with_encoders(ds_in, dtheta_rad, ENCODER_S_VAR, ENCODER_M_VAR);
+    }
+
+    // GPS correction (if available)
+    if (UsingGPS &amp;&amp; sensor_data.gps_ok) {
+        double x_in = sensor_data.gps_x / 25.4; // mm -&gt; inches (1in = 25.4mm)
+        double y_in = sensor_data.gps_y / 25.4; // mm -&gt; inches
+
+        // Use GPS heading if available
+        bool use_heading = true;
+        double heading_deg = sensor_data.gps_heading;
+
+        ekf.correct_with_gps(x_in, y_in, GPS_VAR_X, GPS_VAR_Y,
+                            use_heading, heading_deg, GPS_VAR_HEADING);
+    }
+
+    prev_update_time_ms = current_time_ms;</code></pre>
+            <p class="code-note">
+              This path enforces dt bounds, derives odometry terms, then performs EKF prediction and
+              sensor corrections (gyro, encoders, GPS). It is the core runtime bridge between
+              simulated measurements and estimator updates.
+            </p>
+          </article>
+
+          <article class="snippet-card">
+            <p class="snippet-label">Reference — EKF Prediction Model (<code>EKF.cpp</code>)</p>
+            <pre><code>void EKF::predict_from_odometry(double v_inps, double omega_rad_s, double dt_s) {
+    // Save previous state
+    double x_prev = state_.x;
+    double y_prev = state_.y;
+    double theta_prev = state_.theta;
+
+    // State prediction (unicycle kinematic model)
+    if (std::abs(omega_rad_s) &lt; 1e-6) {
+        // Approximately straight motion
+        state_.x += v_inps * std::cos(theta_prev) * dt_s;
+        state_.y += v_inps * std::sin(theta_prev) * dt_s;
+        state_.theta += omega_rad_s * dt_s;
+    } else {
+        // Motion with rotation
+        double ratio = v_inps / omega_rad_s;
+        state_.x += ratio * (std::sin(theta_prev + omega_rad_s * dt_s) - std::sin(theta_prev));
+        state_.y += ratio * (-std::cos(theta_prev + omega_rad_s * dt_s) + std::cos(theta_prev));
+        state_.theta += omega_rad_s * dt_s;
+    }
+
+    state_.v = v_inps;
+    state_.omega = omega_rad_s;
+
+    // Normalize angle
+    normalize_angle(state_.theta);
+
+    // Accumulate traveled distance
+    distance_traveled_in_ += std::abs(v_inps * dt_s);
+
+    // Predict covariance
+    predict_covariance(v_inps, omega_rad_s, dt_s);
+}</code></pre>
+            <p class="code-note">
+              The prediction step updates pose from odometry, normalizes heading, accumulates traveled
+              distance, and calls covariance propagation. This is the process model being validated by
+              the standalone harness.
+            </p>
+          </article>
+
+          <article class="snippet-card">
+            <p class="snippet-label">Reference — EKF State Interface (<code>EKF.hpp</code>)</p>
+            <pre><code>struct EKFState {
+    double x;        ///&lt; X position in inches
+    double y;        ///&lt; Y position in inches
+    double theta;    ///&lt; Orientation (yaw) in radians
+    double v;        ///&lt; Linear velocity in/s
+    double omega;    ///&lt; Angular velocity in rad/s
+};</code></pre>
+            <p class="code-note">
+              The exported state includes pose and velocity terms used throughout simulation, debug,
+              and final comparison code paths.
+            </p>
+          </article>
+
+          <article class="snippet-card">
+            <p class="snippet-label">Reference — Sensor Configuration Constants (<code>sensor_feeder.hpp</code>)</p>
+            <pre><code>// Sensor configuration flags
+constexpr bool UsingGPS = true;
+constexpr bool UsingIMU = true;
+constexpr bool UsingEncoders = true;
+
+// Conversion configuration (tune for your robot)
+constexpr double WHEEL_RADIUS_IN = 2.0;     // Wheel radius (in) - 2&quot; = 5.08cm
+constexpr double GEAR_RATIO = 1.0;            // Gear ratio
+constexpr double TICKS_PER_REV = 36000.0;      // Ticks per revolution (Rotation sensor)
+constexpr double ENCODER_S_VAR = 0.01;        // Linear encoder variance (in²)
+constexpr double ENCODER_M_VAR = 0.001;        // Angular encoder variance (rad²)
+constexpr double GYRO_VAR = 0.01;              // Gyroscope variance (rad²/s²)
+constexpr double GPS_VAR_X = 1.0;             // GPS X variance (in²)
+constexpr double GPS_VAR_Y = 1.0;             // GPS Y variance (in²)
+constexpr double GPS_VAR_HEADING = 0.1;        // GPS heading variance (rad²)
+</code></pre>
+            <p class="code-note">
+              Compile-time flags and variances define which sensors are active and how measurement
+              noise is modeled in the simulated feeder path.
+            </p>
+          </article>
+
+          <article class="snippet-card">
+            <p class="snippet-label">Reference — Debug Timing Configuration (<code>ekf_debug.hpp</code>)</p>
+            <pre><code>// Debug configuration
+constexpr bool EKF_PASSIVE_MODE = true;
+constexpr uint32_t DEBUG_PRINT_INTERVAL_MS = 150;  // Print every 150ms
+constexpr int PRECISION_DIGITS = 3;
+
+// Static variables for debug
+static uint64_t last_debug_print = 0;
+static uint32_t debug_update_count = 0;</code></pre>
+            <p class="code-note">
+              Passive debug mode and interval constants control deterministic logging cadence during
+              simulation runs.
             </p>
           </article>
         </article>
@@ -103,7 +421,7 @@ assert(metrics.maxPoseError &lt; threshold);</code></pre>
     </main>
 
     <footer class="site-footer">
-      <p>&copy; 2026 Jorge M. Guzman</p>
+      <p>&copy; 2026 Jorge M. Guzmán</p>
       <p>Autonomous systems software engineering portfolio.</p>
     </footer>
   </body>

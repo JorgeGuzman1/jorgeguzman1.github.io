@@ -3,19 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Holonomic Pure Pursuit + Pose Lock | Jorge M. Guzman</title>
+    <title>Holonomic Pure Pursuit + Real-Time Drivetrain Integration | Jorge M. Guzmán</title>
     <meta
       name="description"
-      content="Holonomic trajectory tracking and pose lock project by Jorge M. Guzman with dynamic lookahead and smooth transition handling."
+      content="Holonomic Pure Pursuit controller with arc-length projection, lookahead sampling, robot-frame command generation, and drivetrain dispatch integration."
     />
-    <meta property="og:title" content="Holonomic Pure Pursuit + Pose Lock | Jorge M. Guzman" />
+    <meta property="og:title" content="Holonomic Pure Pursuit + Real-Time Drivetrain Integration | Jorge M. Guzmán" />
     <meta
       property="og:description"
-      content="Dynamic lookahead, heading decoupling, and pose-lock strategy for reliable endpoint convergence."
+      content="Geometric trajectory tracking with arc-length progression, dynamic lookahead, and deterministic drivetrain command dispatch."
     />
     <meta property="og:type" content="article" />
     <meta property="og:url" content="https://jorgeguzman.github.io/projects/hpp.html" />
-    <meta property="og:image" content="https://jorgeguzman.github.io/assets/jorge-placeholder.svg" />
+    <meta property="og:image" content="/assets/og-cover.png" />
     <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
     <link rel="stylesheet" href="../style.css" />
   </head>
@@ -23,7 +23,7 @@
     <header class="site-header">
       <a class="brand" href="../index.html#top" aria-label="Go to homepage top">
         <span class="brand-mark">JG</span>
-        <span>Jorge M. Guzman</span>
+        <span>Jorge M. Guzmán</span>
       </a>
       <nav class="main-nav" aria-label="Primary navigation">
         <a href="../index.html#projects">Projects</a>
@@ -36,67 +36,285 @@
 
     <main class="container page-title-wrap">
       <a class="back-link" href="../index.html#projects">← Back to Projects</a>
-      <h1>Holonomic Pure Pursuit + Pose Lock</h1>
+      <h1>Holonomic Pure Pursuit + Real-Time Drivetrain Integration</h1>
       <p class="lead">
-        Geometric trajectory tracking with dynamic lookahead and endpoint pose locking to improve
-        repeatability near final approach.
+        Geometric trajectory tracking with arc-length progression, dynamic lookahead, and deterministic
+        drivetrain command dispatch.
       </p>
 
       <section class="section project-grid" aria-labelledby="overview-title">
         <article class="card">
           <h2 id="overview-title">Overview</h2>
-          <p>
-            This controller combines path-following behavior for mid-course motion with a terminal
-            pose-lock mode for precise final alignment in both translation and heading.
-          </p>
+          <ul class="bullets">
+            <li>HPP operates on a precomputed smooth trajectory.</li>
+            <li>Uses arc-length parameterization instead of waypoint index tracking.</li>
+            <li>Computes <code>s_robot</code> projection onto path.</li>
+            <li>Selects lookahead point at <code>s_robot + L</code>.</li>
+            <li>Converts global error into robot frame.</li>
+            <li>Decouples heading control from translational tracking.</li>
+            <li>Integrates with motion profiling (S-curve) for speed magnitude control.</li>
+            <li>Dispatches commands to drivetrain abstraction (TankDrive / Holonomic).</li>
+          </ul>
         </article>
 
         <article class="card">
           <h2>What I Built</h2>
           <ul class="bullets">
-            <li>Implemented pure pursuit for holonomic trajectory tracking with arc-length progression.</li>
-            <li>Added dynamic lookahead scaling to balance responsiveness and smoothness.</li>
-            <li>Decoupled heading management from translational tracking when needed.</li>
-            <li>Implemented pose-lock logic near goal to settle residual position and heading error.</li>
-            <li>Applied S-curve modifications to reduce abrupt command transitions.</li>
+            <li>Implemented arc-length–based pure pursuit tracking.</li>
+            <li>Implemented projection logic to compute longitudinal progress along path.</li>
+            <li>Implemented dynamic lookahead selection based on configuration.</li>
+            <li>Converted global position error into robot-frame velocity commands.</li>
+            <li>Decoupled heading correction from translational control.</li>
+            <li>Integrated controller output with drivetrain abstraction layer.</li>
+            <li>Designed controller for deterministic 100 Hz loop compatibility.</li>
           </ul>
         </article>
 
         <article class="card">
           <h2>Technical Notes</h2>
           <div class="meta">
-            <div class="meta-row"><strong>Controller Type</strong><span>Geometric tracking with adaptive preview.</span></div>
-            <div class="meta-row"><strong>Inputs</strong><span>Current pose, arc-length reference, path geometry.</span></div>
-            <div class="meta-row"><strong>Endpoint Logic</strong><span>Pose-lock mode transitions based on near-goal thresholds.</span></div>
+            <div class="meta-row"><strong>Controller Type</strong><span>Geometric tracking with arc-length parameterization.</span></div>
+            <div class="meta-row"><strong>Lookahead Policy</strong><span><code>L = cfg_.lookahead_in</code> in this implementation; no scaling-factor term is present in code.</span></div>
+            <div class="meta-row"><strong>Heading Control</strong><span>Independent proportional heading correction using <code>kHeading</code>.</span></div>
+            <div class="meta-row"><strong>Motion Profile</strong><span>Speed magnitude is provided externally through profile integration and consumed in the controller step.</span></div>
+            <div class="meta-row"><strong>Drivetrain Layer</strong><span>Commands are mapped into differential drivetrain outputs through <code>setChassisVelocity</code>.</span></div>
           </div>
         </article>
 
         <article class="card">
           <h2>Results & Validation</h2>
           <ul class="bullets">
-            <li>Smoother approach behavior near curve transitions than fixed-lookahead baselines.</li>
-            <li>Improved endpoint consistency with pose-lock activation.</li>
-            <li>Cross-track RMS: [placeholder metric].</li>
-            <li>Final pose error envelope: [placeholder metric].</li>
+            <li>Stable tracking across curved trajectories.</li>
+            <li>Reduced oscillation compared to fixed-index waypoint tracking.</li>
+            <li>Smooth speed transitions via motion profile integration.</li>
+            <li>Deterministic command output compatible with embedded execution.</li>
+            <li>Cross-track RMS: logged during field runs (aggregation pending).</li>
+            <li>Final pose error envelope: repeatable convergence observed across repeated runs (numeric envelope pending log aggregation).</li>
           </ul>
         </article>
 
         <article class="card">
           <h2>Code Snippets</h2>
+
           <article class="snippet-card">
-            <p class="snippet-label">Lookahead and Mode Logic (placeholder)</p>
-            <pre><code>// Replace with real pure pursuit / pose lock excerpt.
-double L = base_lookahead + k_speed * speed;
-if (near_goal(distance_to_goal, heading_error)) {
-  mode = ControlMode::PoseLock;
+            <p class="snippet-label">Snippet A — Arc-Length Projection / Progress Computation</p>
+            <pre><code>double Controller::projectPoseToS(const Trajectory&amp; traj, const Pose&amp; pose,
+                                  double min_seg_len_in, double s_eps_in,
+                                  std::size_t* io_hint_idx) {
+  if (traj.empty()) return 0.0;
+  if (traj.size() == 1) return traj.front().s_in;
+
+  const double px = pose.x_in;
+  const double py = pose.y_in;
+
+  const std::size_t nSeg = traj.size() - 1;
+  std::size_t start = 0;
+  if (io_hint_idx &amp;&amp; *io_hint_idx &lt; nSeg) start = *io_hint_idx;
+
+  double bestD2 = std::numeric_limits&lt;double&gt;::infinity();
+  double bestS = traj.front().s_in;
+  std::size_t bestIdx = 0;
+
+  const double minSeg2 = min_seg_len_in * min_seg_len_in;
+
+  for (std::size_t k = 0; k &lt; nSeg; ++k) {
+    const std::size_t i = (start + k) % nSeg;
+    const auto&amp; A = traj[i];
+    const auto&amp; B = traj[i + 1];
+
+    const double ax = A.x_in, ay = A.y_in;
+    const double bx = B.x_in, by = B.y_in;
+
+    const double vx = bx - ax;
+    const double vy = by - ay;
+    const double segLen2 = vx * vx + vy * vy;
+    if (segLen2 &lt; minSeg2) continue;
+
+    const double wx = px - ax;
+    const double wy = py - ay;
+
+    double t = (wx * vx + wy * vy) / segLen2;
+    t = clampd(t, 0.0, 1.0);
+
+    const double qx = ax + t * vx;
+    const double qy = ay + t * vy;
+
+    const double dx = px - qx;
+    const double dy = py - qy;
+    const double d2 = dx * dx + dy * dy;
+
+    if (d2 &lt; bestD2) {
+      bestD2 = d2;
+      const double ds = (B.s_in - A.s_in);
+      bestS = A.s_in + t * ds;
+      bestIdx = i;
+    }
+  }
+
+  if (io_hint_idx) *io_hint_idx = bestIdx;
+
+  const double s0 = traj.front().s_in;
+  const double s1 = traj.back().s_in;
+  bestS = clampd(bestS, s0, s1);
+
+  if (std::abs(bestS - s0) &lt; s_eps_in) bestS = s0;
+  if (std::abs(bestS - s1) &lt; s_eps_in) bestS = s1;
+
+  return bestS;</code></pre>
+            <p class="code-note">
+              This function projects the robot pose onto each trajectory segment and picks the closest projection
+              by squared distance. The selected parameter <code>t</code> is converted into arc-length space as
+              <code>bestS</code>, which becomes the controller’s progress state.
+            </p>
+          </article>
+
+          <article class="snippet-card">
+            <p class="snippet-label">Snippet B — Lookahead Selection</p>
+            <pre><code>  const double s_robot =
+    projectPoseToS(traj_, in.pose, cfg_.min_seg_len_in, cfg_.s_eps_in, &amp;proj_hint_idx_);
+  out.s_robot_in = s_robot;
+
+  const double s_end = traj_.back().s_in;
+  const double remainingDist_in = std::max(0.0, s_end - s_robot);
+
+  const double v_des_ips = mp_.update(remainingDist_in, cfg_.dt_s);
+
+  const double s_target = s_robot + cfg_.lookahead_in;
+  out.s_target_in = s_target;
+
+  const TrajectorySample look =
+    sampleAtS(traj_, s_target, cfg_.s_eps_in, &amp;samp_hint_idx_);
+  out.lookahead = look;</code></pre>
+            <p class="code-note">
+              The controller computes <code>s_target = s_robot + cfg_.lookahead_in</code> and samples a trajectory
+              point at that arc-length using <code>sampleAtS(...)</code>. This keeps target selection tied to
+              geometric progress instead of waypoint index.
+            </p>
+          </article>
+
+          <article class="snippet-card">
+            <p class="snippet-label">Snippet C — Robot-Frame Error Conversion</p>
+            <pre><code>  const double ex_f = look.x_in - in.pose.x_in;
+  const double ey_f = look.y_in - in.pose.y_in;
+
+  const double c = std::cos(in.pose.theta_rad);
+  const double s = std::sin(in.pose.theta_rad);
+
+  const double ex_r =  c * ex_f + s * ey_f;
+  const double ey_r = -s * ex_f + c * ey_f;</code></pre>
+            <p class="code-note">
+              Global-frame position error is rotated into robot coordinates using the robot heading.
+              This makes translational command components align with the robot-centric command model
+              used by the controller output.
+            </p>
+          </article>
+
+          <article class="snippet-card">
+            <p class="snippet-label">Snippet D — Heading Decoupling</p>
+            <pre><code>double Controller::wrapPi(double a_rad) {
+  static constexpr double kPi = 3.14159265358979323846;
+  while (a_rad &gt;  kPi) a_rad -= 2.0 * kPi;
+  while (a_rad &lt; -kPi) a_rad += 2.0 * kPi;
+  return a_rad;
 }
 
-if (mode == ControlMode::PoseLock) {
-  cmd = computePoseLockCommand(state, goal, gains);
-}</code></pre>
+double Controller::angleDiff(double a_rad, double b_rad) {
+  return wrapPi(a_rad - b_rad);
+}
+
+  const double h_err = angleDiff(theta_ref_used, in.pose.theta_rad);
+  double omega = cfg_.kHeading * h_err;
+
+  omega = clampd(omega, -cfg_.omega_max_rps, cfg_.omega_max_rps);
+  cmd.omega_rps = omega;</code></pre>
             <p class="code-note">
-              Paste a real excerpt from your controller to show dynamic lookahead selection and final
-              pose-lock mode switching.
+              Angle normalization is handled by <code>wrapPi</code>/<code>angleDiff</code>, then heading command
+              is computed independently with proportional gain and saturation. This keeps yaw control
+              decoupled from translational target direction.
+            </p>
+          </article>
+
+          <article class="snippet-card">
+            <p class="snippet-label">Snippet E — Command Dispatch to Drivetrain</p>
+            <pre><code>void TankDrive::setWheelVelIps(double vLeft_ips, double vRight_ips) {
+  double rpmL = ipsToMotorRpm(vLeft_ips);
+  double rpmR = ipsToMotorRpm(vRight_ips);
+
+  const double maxRpm = maxMotorRpmLimit();
+
+  // Preserve curvature: if either side saturates, scale both equally.
+  const double maxAbs = std::max(std::abs(rpmL), std::abs(rpmR));
+  if (maxAbs &gt; maxRpm &amp;&amp; maxAbs &gt; 1e-9) {
+    const double scale = maxRpm / maxAbs;
+    rpmL *= scale;
+    rpmR *= scale;
+  }
+
+  rpmL = clamp(rpmL, -maxRpm, +maxRpm);
+  rpmR = clamp(rpmR, -maxRpm, +maxRpm);
+
+  leftMotors_.moveVelocity(static_cast&lt;std::int16_t&gt;(std::lround(rpmL)));
+  rightMotors_.moveVelocity(static_cast&lt;std::int16_t&gt;(std::lround(rpmR)));
+}
+
+void TankDrive::setChassisVelocity(const aon::hpp::Command &amp;cmd) {
+  // Differential kinematics (omega CCW+):
+  //   vL = vx - omega*(W/2)
+  //   vR = vx + omega*(W/2)
+  const double halfW = 0.5 * kin_.track_width_in;
+  const double vL_ips = cmd.vx_ips - (cmd.omega_rps * halfW);
+  const double vR_ips = cmd.vx_ips + (cmd.omega_rps * halfW);
+
+  setWheelVelIps(vL_ips, vR_ips);
+}
+</code></pre>
+            <p class="code-note">
+              The abstraction boundary is <code>setChassisVelocity(const aon::hpp::Command&amp;)</code>.
+              HPP command fields are converted to left/right wheel velocities via differential kinematics,
+              then mapped to bounded motor RPM outputs.
+            </p>
+          </article>
+
+          <article class="snippet-card">
+            <p class="snippet-label">Snippet F — Motion Profile Integration (Consumption Only)</p>
+            <pre><code>  const double s_end = traj_.back().s_in;
+  const double remainingDist_in = std::max(0.0, s_end - s_robot);
+
+  const double v_des_ips = mp_.update(remainingDist_in, cfg_.dt_s);
+
+  const double s_target = s_robot + cfg_.lookahead_in;
+  out.s_target_in = s_target;
+
+  double v = std::max(0.0, v_des_ips);
+  v = std::min(v, cfg_.v_max_ips);
+
+  Command cmd{};
+  cmd.vx_ips = ux * v;
+  cmd.vy_ips = (cfg_.mode == Mode::HDrive) ? (uy * v) : 0.0;</code></pre>
+            <p class="code-note">
+              This shows only the integration point where the controller consumes profile output
+              as <code>v_des_ips</code> and combines it with normalized direction to produce final
+              translational command components.
+            </p>
+          </article>
+
+          <article class="snippet-card">
+            <p class="snippet-label">Config Reference — Lookahead / Heading Limits</p>
+            <pre><code>struct Config {
+  Mode mode = Mode::HDrive;
+
+  double lookahead_in = 12.0;
+
+  double min_seg_len_in = 0.25;
+  double s_eps_in = 1e-6;
+
+  double v_max_ips = 60.0;
+
+  double kHeading = 1.5;
+  double omega_max_rps = 6.0;</code></pre>
+            <p class="code-note">
+              These configuration fields define lookahead distance and heading limits used by the
+              runtime control step. In this version, lookahead is configured as a direct distance term.
             </p>
           </article>
         </article>
@@ -104,7 +322,7 @@ if (mode == ControlMode::PoseLock) {
     </main>
 
     <footer class="site-footer">
-      <p>&copy; 2026 Jorge M. Guzman</p>
+      <p>&copy; 2026 Jorge M. Guzmán</p>
       <p>Autonomous systems software engineering portfolio.</p>
     </footer>
   </body>

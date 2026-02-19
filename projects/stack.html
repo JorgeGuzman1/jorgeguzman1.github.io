@@ -3,19 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Autonomous Navigation & Control Stack | Jorge M. Guzman</title>
+    <title>Autonomous Navigation & Control Stack | Jorge M. Guzmán</title>
     <meta
       name="description"
-      content="Autonomous navigation and control stack project by Jorge M. Guzman, focused on modular architecture and interface boundaries."
+      content="System-level autonomy architecture separating estimation, planning, smoothing, sampling, and control into independently evolvable subsystems."
     />
-    <meta property="og:title" content="Autonomous Navigation & Control Stack | Jorge M. Guzman" />
+    <meta property="og:title" content="Autonomous Navigation & Control Stack | Jorge M. Guzmán" />
     <meta
       property="og:description"
-      content="Pipeline architecture separating estimation, planning, smoothing, sampling, and control."
+      content="Architectural autonomy pipeline with interface boundaries, deterministic scheduling assumptions, and low-coupling subsystem integration."
     />
     <meta property="og:type" content="article" />
     <meta property="og:url" content="https://jorgeguzman.github.io/projects/stack.html" />
-    <meta property="og:image" content="https://jorgeguzman.github.io/assets/jorge-placeholder.svg" />
+    <meta property="og:image" content="/assets/og-cover.png" />
     <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
     <link rel="stylesheet" href="../style.css" />
   </head>
@@ -23,7 +23,7 @@
     <header class="site-header">
       <a class="brand" href="../index.html#top" aria-label="Go to homepage top">
         <span class="brand-mark">JG</span>
-        <span>Jorge M. Guzman</span>
+        <span>Jorge M. Guzmán</span>
       </a>
       <nav class="main-nav" aria-label="Primary navigation">
         <a href="../index.html#projects">Projects</a>
@@ -38,74 +38,115 @@
       <a class="back-link" href="../index.html#projects">← Back to Projects</a>
       <h1>Autonomous Navigation & Control Stack</h1>
       <p class="lead">
-        A modular autonomy architecture that cleanly separates estimation, planning,
-        smoothing, sampling, and control into independently tunable subsystems.
+        System-level autonomy architecture separating estimation, planning, smoothing, sampling, and
+        control into independently evolvable subsystems.
       </p>
 
       <section class="section project-grid" aria-labelledby="overview-title">
         <article class="card">
           <h2 id="overview-title">Overview</h2>
           <p>
-            This project formalized subsystem contracts so trajectory generation and tracking could evolve
-            without destabilizing state estimation or hardware interfaces.
+            This project defines the full autonomy pipeline from sensing to drivetrain command
+            dispatch. Each subsystem owns a strict contract and boundary so algorithm updates can be
+            introduced without destabilizing adjacent modules. The architecture is built around
+            deterministic execution order, enabling repeatable real-time behavior under iterative
+            development.
           </p>
         </article>
 
-        <article class="card">
-          <h2>What I Built</h2>
-          <ul class="bullets">
-            <li>Defined module boundaries for estimator, planner, smoother, sampler, and controller stages.</li>
-            <li>Implemented parameter structs to decouple tuning values from algorithmic logic.</li>
-            <li>Standardized data handoff formats for pose, path, and control references.</li>
-            <li>Added deterministic scheduling assumptions for predictable end-to-end latency.</li>
-            <li>Introduced clear ownership of coordinate transforms and unit conventions.</li>
-          </ul>
-        </article>
+        <hr class="section-divider" />
 
         <article class="card">
-          <h2>Technical Notes</h2>
-          <div class="meta">
-            <div class="meta-row"><strong>Core Pattern</strong><span>Interface-first modular design.</span></div>
-            <div class="meta-row"><strong>Primary Language</strong><span>C++ with strongly typed structs and explicit units.</span></div>
-            <div class="meta-row"><strong>Control Flow</strong><span>Estimation → planning → smoothing → sampling → control.</span></div>
+          <h2>System Architecture</h2>
+          <div class="stack-diagram" role="img" aria-label="Autonomy stack flow: Sensors to State Estimation, Global Planning, Path Processing, Arc-Length Sampling, Motion Profiling, Geometric Tracking, and Drivetrain Interface.">
+            <div class="stack-step">Sensors</div>
+            <div class="stack-arrow" aria-hidden="true">↓</div>
+            <div class="stack-step">State Estimation (EKF)</div>
+            <div class="stack-arrow" aria-hidden="true">↓</div>
+            <div class="stack-step">Global Planning (A*)</div>
+            <div class="stack-arrow" aria-hidden="true">↓</div>
+            <div class="stack-step">Path Processing (RDP + Smoothing)</div>
+            <div class="stack-arrow" aria-hidden="true">↓</div>
+            <div class="stack-step">Arc-Length Sampling</div>
+            <div class="stack-arrow" aria-hidden="true">↓</div>
+            <div class="stack-step">Motion Profiling (S-curve)</div>
+            <div class="stack-arrow" aria-hidden="true">↓</div>
+            <div class="stack-step">Geometric Tracking (HPP)</div>
+            <div class="stack-arrow" aria-hidden="true">↓</div>
+            <div class="stack-step">Drivetrain Interface</div>
           </div>
+          <p class="code-note">
+            Data flow advances through explicit artifacts (pose, path, sampled reference, command),
+            while control flow remains scheduler-driven. Keeping those concerns separate reduces hidden
+            coupling and keeps timing behavior predictable.
+          </p>
         </article>
 
+        <hr class="section-divider" />
+
         <article class="card">
-          <h2>Results & Validation</h2>
+          <h2>Design Principles</h2>
           <ul class="bullets">
-            <li>Subsystem integration regressions reduced through stable interfaces.</li>
-            <li>Runtime behavior remained consistent under repeated tuning cycles.</li>
-            <li>Latency budget: [placeholder metric].</li>
-            <li>Path execution accuracy improvement: [placeholder metric].</li>
+            <li><strong>Interface-first modular design:</strong> each stage publishes/consumes explicit contracts rather than shared internal state.</li>
+            <li><strong>Deterministic scheduling assumptions:</strong> execution order is stable and bounded for repeatable runtime behavior.</li>
+            <li><strong>Explicit coordinate-frame ownership:</strong> frame semantics are assigned per module to prevent transform ambiguity.</li>
+            <li><strong>Unit-consistent data handoff:</strong> subsystem boundaries enforce predictable units to avoid silent scale errors.</li>
+            <li><strong>Config-driven tuning (parameter structs):</strong> tuning moves through configuration layers, not algorithm rewrites.</li>
+          </ul>
+          <p class="code-note">
+            These rules reduced integration regressions by containing change impact. Teams could iterate
+            individual modules without forcing cross-stack revalidation on every tuning cycle.
+          </p>
+        </article>
+
+        <hr class="section-divider" />
+
+        <article class="card">
+          <h2>What I Architected</h2>
+          <ul class="bullets">
+            <li>Defined module boundaries and data contracts across subsystems.</li>
+            <li>Established trajectory lifecycle: path → smoothed path → sampled trajectory → control reference.</li>
+            <li>Structured configuration layers to isolate tuning from logic.</li>
+            <li>Designed predictable execution order for 100 Hz loop compatibility.</li>
+            <li>Coordinated subsystem evolution without cross-module breakage.</li>
           </ul>
         </article>
 
-        <article class="card">
-          <h2>Code Snippets</h2>
-          <article class="snippet-card">
-            <p class="snippet-label">Pipeline Interface Sketch (placeholder)</p>
-            <pre><code>// Replace with real stack module excerpt from your codebase.
-struct PlannerOutput {
-  Path path;
-  Trajectory trajectory;
-  ControlHints hints;
-};
+        <hr class="section-divider" />
 
-ControlCommand runController(const EstimatorState&amp; state,
-                             const TrajectorySample&amp; sample,
-                             const ControlGains&amp; gains);</code></pre>
-            <p class="code-note">
-              This placeholder indicates where a real interface excerpt should be pasted to demonstrate
-              module boundaries and decoupled tuning structures.
-            </p>
-          </article>
+        <article class="card">
+          <h2>Integration Strategy</h2>
+          <ul class="bullets">
+            <li>Estimator runs independently and publishes pose.</li>
+            <li>Planner consumes pose and publishes path.</li>
+            <li>Controller consumes trajectory sample and pose.</li>
+            <li>Drivetrain abstracts motor outputs.</li>
+          </ul>
+          <p class="code-note">
+            This separation keeps subsystem dependencies one-directional and explicit. Lower coupling
+            means planner/controller iterations do not require estimator rewrites, and actuator changes
+            remain localized behind drivetrain interfaces.
+          </p>
+        </article>
+
+        <hr class="section-divider" />
+
+        <article class="card">
+          <h2>Results &amp; Validation</h2>
+          <ul class="bullets">
+            <li>Reduced subsystem integration regressions through stable contracts.</li>
+            <li>Improved ability to tune controller behavior without touching estimator internals.</li>
+            <li>Stable runtime latency under iterative development.</li>
+            <li>Deterministic behavior across repeated runs.</li>
+            <li>Path execution consistency improved through stable interfaces and repeatable tuning.</li>
+            <li>Latency budget: designed for deterministic 100 Hz operation (10 ms cycle target).</li>
+          </ul>
         </article>
       </section>
     </main>
 
     <footer class="site-footer">
-      <p>&copy; 2026 Jorge M. Guzman</p>
+      <p>&copy; 2026 Jorge M. Guzmán</p>
       <p>Autonomous systems software engineering portfolio.</p>
     </footer>
   </body>
